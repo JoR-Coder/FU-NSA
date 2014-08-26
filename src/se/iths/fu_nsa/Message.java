@@ -123,6 +123,10 @@ public class Message {
 		return result;
 	}
 	
+	private String fromXOR( String msg ){
+		return "nil";
+	}
+	
 	private char getCharNumberAt( String msg, int index ){
 
 		int msgIndex  =  0;
