@@ -124,6 +124,7 @@ public class Message {
 	}
 	
 	private String fromXOR( String msg ){
+		// TODO: add frikkin code here....
 		return "nil";
 	}
 	
