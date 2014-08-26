@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FU-NSA</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="encrypt">Kryptera</string>
+    <string name="decrypt">Avkoda</string>
+    <string name="ClearTextHere">Ange klartext här&#8230;</string>
+    <string name="EncryptedTextHere">Krypterad text här&#8230;</string>
+
+    
+    <string-array name="code_array">
+        <item >ClearText</item>
+        <item >Nummer</item>
+        <item >ShiftRight</item>
+        <item >XOR</item>
+        <item >Base64</item>
+    </string-array>
+    
+    
+    
+</resources>
