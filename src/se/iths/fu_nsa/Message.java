@@ -128,6 +128,12 @@ public class Message {
 		return "nil";
 	}
 	
+	
+	private String toXOR( String msg){
+		// TODO: coding doiding moiling....
+		return "nil";
+	}
+	
 	private char getCharNumberAt( String msg, int index ){
 
 		int msgIndex  =  0;
