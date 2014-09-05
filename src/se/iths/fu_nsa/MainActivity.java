@@ -1,8 +1,14 @@
 package se.iths.fu_nsa; 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.OnNavigationListener;
 import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,7 +35,9 @@ Ett som översätter alla bokstäver till siffror, separerade med bindestreck (a
 “Hejsan!” ⇒ 7-4-9-18-0-13!”’
 
 Utökning: spara översättning
-Användaren ska kunna spara en översättning för att kunna kolla på den senare. Användaren ska då kunna klicka på en knapp för att spara de nuvarande strängarna, och det krypterade samt det okrypterade ska sparas i en lista. Användaren ska sedan kunna klicka fram listan, och klicka på en av de/krypteringar som finns där, för att den ska visas i appen.
+Användaren ska kunna spara en översättning för att kunna kolla på den senare. Användaren ska då kunna klicka på en knapp för att
+ spara de nuvarande strängarna, och det krypterade samt det okrypterade ska sparas i en lista. Användaren ska sedan kunna klicka
+  fram listan, och klicka på en av de/krypteringar som finns där, för att den ska visas i appen.
 
 Krav:
 Knapp för att spara översättning
@@ -45,9 +53,13 @@ public class MainActivity extends ActionBarActivity {
 
 	private EditText clearText;
 	private EditText encryptedText;
-	
+
+	private int index;
+	ArrayList<String> messages;
 	private Message message;
 	private int cipher;
+
+	Bundle extras;
 
 
 	@Override
@@ -56,19 +68,43 @@ public class MainActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Log.d( "iths", "onCreate: pre cipher = "+this.cipher  );
 		cipher = Message.NUMBERS;
-		Log.d( "iths", "onCreate: post cipher = "+this.cipher  );
 		initialize();
-		Log.d( "iths", "onCreate: post init cipher = "+this.cipher  );
 
 		clearText = (EditText) findViewById( R.id.clearText );
 		encryptedText = (EditText) findViewById( R.id.encryptedText );
 
-		message = new Message( "Detta är text som skall krypteras.", cipher );
+		clearText.setText( ""  );
 
-		clearText.setText( message.getDecryptedMessage( cipher ) );
-		encryptedText.setText( message.getEncryptedMessage() );
+
+		Log.d("iths", "And now... Get intent & bundle");
+		Intent intent = getIntent();
+		
+		if( extras == null  ){
+			Log.d("iths", "Ooooo shit'o'shit'o'shit... No bundle, was null");
+			index = 0;
+		}else {
+			extras = intent.getExtras();
+			index = extras.getInt( "value" );
+		}
+
+		// SharedPrefs here... NOOOOW.
+		SharedPreferences prefs = this.getSharedPreferences( "se.iths.fu_nsa-PREFS", Context.MODE_PRIVATE);
+
+		if( prefs == null ) Log.d( "iths", "prefs null" ); else Log.d( "iths", "prefs NOT null" );
+	    messages = new ArrayList<String>( convertToArray(prefs.getString("messages", "")));
+
+	    if ( messages == null ) {
+	    	messages = new ArrayList<String>();
+	    }
+	    if( messages.isEmpty() ){
+	    	Log.d( "iths", "No messages stored :-O" );
+	    	messages.add("");
+	    }
+
+	    if( messages == null ) Log.d( "iths", "WAAAAAAAAAAAAAAAAAAAAAAAATT" );
+	    Log.d("iths", "Finally... Setting text to display.");
+		encryptedText.setText( messages.get(index)  );
 	}
  
 	
@@ -87,6 +123,11 @@ public class MainActivity extends ActionBarActivity {
               @Override
               public boolean onNavigationItemSelected(int position, long itemId) {
                   
+            	  if( position == 5){
+            		  Intent i = new Intent( MainActivity.this, StoredMessageActivity.class );
+            		  startActivity(i);
+            		  
+            	  }
                   cipher = position;
                    
                   Log.d("Position:", Integer.toString(cipher));
@@ -102,14 +143,39 @@ public class MainActivity extends ActionBarActivity {
 	
 	public void encryptBtnClicked( View v ){
 		Log.d( "iths", "Klickade för kryptering av text... cipher = "+this.cipher );
-		message.encryptMessage( clearText.getText().toString(), this.cipher );
+		
+		if( message == null){
+			message = new Message( clearText.getText().toString(), this.cipher );
+		} else {
+			message.encryptMessage( clearText.getText().toString(), this.cipher );			
+		}
+
+		messages.set(index, message.getEncryptedMessage() );
 		encryptedText.setText( message.getEncryptedMessage() );
 	}
 	
 	public void decryptBtnClicked( View v ){
 		Log.d( "iths", "Klickade för avkryptering av text... cipher = "+this.cipher );
-		message.encryptMessage( encryptedText.getText().toString(), Message.CLEARTEXT );
+
+		if( message == null){
+			message = new Message( encryptedText.getText().toString(), Message.CLEARTEXT );
+		} else {
+			message.encryptMessage( encryptedText.getText().toString(), Message.CLEARTEXT );			
+		}
+
 		clearText.setText( message.getDecryptedMessage(this.cipher)  );
+	}
+	
+	public void saveBtnClicked( View v){
+		// Save to list...
+		SharedPreferences prefs = this.getSharedPreferences( "se.iths.fu_nsa-PREFS", Context.MODE_PRIVATE);
+
+		SharedPreferences.Editor editor = prefs.edit();
+
+		editor.putString( "messages", convertToString(messages) );
+		editor.putInt( "index", index);
+
+		if( !editor.commit() )Log.d( "iths", "Failed to save :-(" );
 	}
 	
 	
@@ -129,6 +195,27 @@ public class MainActivity extends ActionBarActivity {
 		if (id == R.id.action_settings) {
 			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
+	
+	private String convertToString(ArrayList<String> list) {
+
+        StringBuilder sb = new StringBuilder();
+        String delim = "";
+        for (String s : list)
+        {
+            sb.append(delim);
+            sb.append(s);;
+            delim = ",";
+        }
+        return sb.toString();
+    }
+
+	private ArrayList<String> convertToArray(String string) {
+
+        ArrayList<String> list = new ArrayList<String>(Arrays.asList(string.split(",")));
+        return list;
+    }
+
 }

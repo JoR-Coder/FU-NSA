@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">FU-NSA</string>
+    <string name="stored_acticity_label">Stored messages</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="encrypt">Kryptera</string>
@@ -16,7 +17,9 @@
         <item >ShiftRight</item>
         <item >XOR</item>
         <item >Base64</item>
+        <item >Select message</item>
     </string-array>
+        <string name="save_encoded_text">Spara</string>
     
     
     

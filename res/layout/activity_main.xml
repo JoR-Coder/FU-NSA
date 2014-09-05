@@ -60,4 +60,14 @@
         android:onClick="decryptBtnClicked"
         android:text="@string/decrypt" />
 
+    <Button
+        android:id="@+id/saveBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/encryptedText"
+        android:layout_alignRight="@+id/encryptedText"
+        android:onClick="saveBtnClicked"
+        android:text="@string/save_encoded_text" />
+
 </RelativeLayout>
